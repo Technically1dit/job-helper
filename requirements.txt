@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+python-jose[cryptography]
+pydantic-settings
+sqlalchemy
+psycopg2-binary
+httpx
+cryptography
+google-genai
+PyMuPDF
+python-multipart
