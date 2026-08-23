@@ -12,8 +12,9 @@ def deduplicate(jobs: list[dict]) -> list[dict]:
     seen: set[tuple[str, ...]] = set()
     unique: list[dict] = []
     for job in jobs:
+        external_id = job.get("external_id")
         url = canonical_url(job.get("apply_url") or job.get("source_url"))
-        identity = ("url", url) if url else ("fields", _key(job.get("company_name")), _key(job.get("title")), _key(job.get("location")))
+        identity = ("external", job.get("provider", ""), str(external_id)) if external_id else (("url", url) if url else ("fields", _key(job.get("company_name")), _key(job.get("title")), _key(job.get("location"))))
         if identity in seen:
             continue
         seen.add(identity)

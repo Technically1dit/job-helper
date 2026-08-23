@@ -19,6 +19,13 @@ class JobSearchTests(unittest.IsolatedAsyncioTestCase):
         second = normalize_job({"title": "Python developer", "company": "Acme", "location": "Ahmedabad", "apply_url": "https://jobs.acme.test/opening"}, "apify")
         self.assertEqual(len(deduplicate([first, second])), 1)
 
+    def test_provider_ids_prevent_google_job_link_collapse(self):
+        jobs = [
+            normalize_job({"title": "Engineer A", "company": "Acme", "location": "India", "job_id": "one", "share_link": "https://google.test/search?htidocid=one&source=test"}, "serpapi"),
+            normalize_job({"title": "Engineer B", "company": "Beta", "location": "India", "job_id": "two", "share_link": "https://google.test/search?htidocid=two&source=test"}, "serpapi"),
+        ]
+        self.assertEqual(len(deduplicate(jobs)), 2)
+
     def test_location_filter_excludes_bengaluru_for_ahmedabad(self):
         jobs = [{"location": "Ahmedabad, Gujarat", "remote": False}, {"location": "Bengaluru, Karnataka", "remote": False}, {"location": "Remote, India", "remote": True}]
         self.assertEqual(len(filter_by_location(jobs, "Ahmedabad")), 2)

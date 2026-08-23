@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from typing import Any
-from urllib.parse import urlparse, urlunparse
+from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 import re
 
 
@@ -21,7 +21,11 @@ def canonical_url(url: Any) -> str | None:
         parsed = urlparse(value)
         if not parsed.scheme or not parsed.netloc:
             return value
-        return urlunparse((parsed.scheme.lower(), parsed.netloc.lower(), parsed.path.rstrip("/"), "", "", ""))
+        # Remove ubiquitous tracking parameters but retain identifiers such as
+        # Google's `htidocid`, which distinguish otherwise identical job links.
+        ignored = {"shndl", "shmd", "shmds", "source", "shem", "htiq", "tracking"}
+        query = [(key, item) for key, item in parse_qsl(parsed.query, keep_blank_values=True) if not key.startswith("utm_") and key not in ignored]
+        return urlunparse((parsed.scheme.lower(), parsed.netloc.lower(), parsed.path.rstrip("/"), "", urlencode(sorted(query)), ""))
     except ValueError:
         return value
 
