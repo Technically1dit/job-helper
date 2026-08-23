@@ -32,7 +32,7 @@ const ApplicationGenerator = () => {
     }
 
     const sendEmail = async () => {
-        if (!recipient) { alert('Recipient email is required'); return }
+        if (!recipient) { alert('A verified recruitment contact is required before sending.'); return }
         setSending(true)
         try {
             await gmailAPI.send({
@@ -44,7 +44,7 @@ const ApplicationGenerator = () => {
             alert('Application sent successfully!')
             navigate('/applications')
         } catch(e) {
-            alert('Failed to send email. Is your Gmail connected?')
+            alert(e.response?.data?.detail || 'Failed to send email. Is your Gmail connected?')
         } finally {
             setSending(false)
         }
@@ -71,10 +71,11 @@ const ApplicationGenerator = () => {
                     <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-1">Recipient Email</label>
                         <input 
-                            type="email" value={recipient} onChange={e => setRecipient(e.target.value)}
-                            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                            placeholder="hr@company.com"
+                            type="email" value={recipient} readOnly
+                            className="w-full cursor-not-allowed bg-gray-50 p-2 border border-gray-300 rounded-lg text-gray-600"
+                            placeholder="No verified recruitment email found"
                         />
+                        <p className="mt-1 text-xs text-gray-500">Only a contact verified from a source can receive an application email.</p>
                     </div>
                     <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-1">Subject</label>
@@ -94,7 +95,7 @@ const ApplicationGenerator = () => {
 
                 <div className="mt-8 flex justify-end">
                     <button 
-                        onClick={sendEmail} disabled={sending || !draft.body}
+                        onClick={sendEmail} disabled={sending || !draft.body || !recipient}
                         className="bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 disabled:opacity-50 flex items-center gap-2"
                     >
                         {sending ? 'Sending...' : <><Send size={20} /> Send via Gmail</>}

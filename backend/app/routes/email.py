@@ -5,6 +5,7 @@ from datetime import datetime
 from backend.app.database import get_db
 from backend.app.models.gmail import GmailAccount
 from backend.app.models.application import Application
+from backend.app.models.job import Job
 from backend.app.auth import get_current_user
 from backend.app.services.crypto import decrypt, encrypt
 from backend.app.services.gmail_service import send_gmail_message, refresh_gmail_token
@@ -20,6 +21,11 @@ class EmailSendRequest(BaseModel):
 
 @router.post("/send")
 async def send_email_endpoint(req: EmailSendRequest, user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
+    job = db.query(Job).filter(Job.id == req.job_id, Job.user_id == user["id"]).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    if not job.contact_email or req.to.casefold() != job.contact_email.casefold():
+        raise HTTPException(status_code=400, detail="A verified recruitment contact is required before sending an application email.")
     acc = db.query(GmailAccount).filter(GmailAccount.user_id == user["id"]).first()
     if not acc: raise HTTPException(status_code=400, detail="Gmail not connected")
     
