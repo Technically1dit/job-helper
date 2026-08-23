@@ -61,6 +61,7 @@ const JobDetail = () => {
                     <div>
                         <h2 className="text-3xl font-bold text-gray-800">{job.title}</h2>
                         <div className="text-xl text-gray-600 mt-2 font-medium">{job.company} &bull; {job.location}</div>
+                        <div className="mt-3 flex flex-wrap gap-2"><span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">Source: {job.source || 'Not available'}</span>{job.apply_url && <a href={job.apply_url} target="_blank" rel="noopener noreferrer" className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">Application link available</a>}</div>
                         {job.job_type && <span className="inline-block mt-4 bg-gray-100 text-gray-700 px-3 py-1 rounded-md text-sm">{job.job_type}</span>}
                     </div>
                     <div className="flex gap-2">
@@ -100,7 +101,7 @@ const JobDetail = () => {
                     
                     {/* Write Application Email button */}
                     <button 
-                        onClick={() => navigate(/jobs//application)}
+                        onClick={() => navigate(`/jobs/${id}/application`)}
                         className="w-full flex items-center justify-center gap-2 p-4 bg-green-600 text-white rounded-xl shadow-sm font-semibold hover:bg-green-700 transition"
                     >
                         <Mail size={20} /> Write Application
@@ -160,6 +161,8 @@ const JobDetail = () => {
                             </div>
                         </div>
                     )}
+
+                    {!job.contact_email && <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100"><h3 className="font-bold text-gray-800 mb-2">Recruitment contact</h3><p className="text-sm text-gray-500">Recruitment email: Not found. We only show addresses verified in a source.</p></div>}
 
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                         <h3 className="font-bold text-gray-800 mb-4">Job Description</h3>

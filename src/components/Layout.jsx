@@ -1,50 +1,37 @@
-import { Outlet, Link } from 'react-router-dom'
+import { Outlet, NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { LogOut, User, Briefcase, LayoutDashboard, Mail, FileText, Bell } from 'lucide-react'
+import { LogOut, User, Briefcase, LayoutDashboard, Mail, FileText, Menu, X } from 'lucide-react'
+import { useState } from 'react'
 
 const Layout = () => {
     const { logout } = useAuth()
+    const [open, setOpen] = useState(false)
+    const navItems = [
+        ['/', 'Dashboard', LayoutDashboard], ['/jobs', 'Jobs', Briefcase], ['/applications', 'Applications', FileText], ['/profile', 'Profile', User], ['/gmail', 'Gmail', Mail]
+    ]
+    const navClass = ({ isActive }) => `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${isActive ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950'}`
 
     return (
-        <div className="flex h-screen bg-gray-50">
-            {/* Sidebar */}
-            <div className="w-64 bg-white border-r border-gray-200 p-4 flex flex-col">
-                <div className="text-xl font-bold text-blue-600 mb-8 px-4">JobHunter AI</div>
+        <div className="min-h-screen bg-slate-50 text-slate-900">
+            <aside className={`${open ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-slate-200 bg-white p-4 transition-transform lg:translate-x-0`}>
+                <div className="mb-8 flex items-center justify-between px-2"><NavLink to="/" className="flex items-center gap-2 text-lg font-bold tracking-tight text-slate-900"><span className="grid h-8 w-8 place-items-center rounded-lg bg-indigo-600 text-sm text-white">J</span>JobPilot</NavLink><button onClick={() => setOpen(false)} className="rounded-lg p-2 text-slate-500 lg:hidden"><X size={19}/></button></div>
                 
-                <nav className="flex-1 space-y-2">
-                    <Link to="/" className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg">
-                        <LayoutDashboard size={20} /> Dashboard
-                    </Link>
-                    <Link to="/jobs" className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg">
-                        <Briefcase size={20} /> Search Jobs
-                    </Link>
-                    <Link to="/applications" className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg">
-                        <FileText size={20} /> Applications
-                    </Link>
-                    <Link to="/profile" className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg">
-                        <User size={20} /> Profile
-                    </Link>
-                    <Link to="/gmail" className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg">
-                        <Mail size={20} /> Gmail Settings
-                    </Link>
+                <nav className="flex-1 space-y-1">
+                    {navItems.map(([to, label, Icon]) => <NavLink end={to === '/'} key={to} to={to} onClick={() => setOpen(false)} className={navClass}><Icon size={18}/>{label}</NavLink>)}
                 </nav>
                 
-                <button onClick={logout} className="flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg w-full">
-                    <LogOut size={20} /> Logout
+                <button onClick={logout} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-rose-600 transition hover:bg-rose-50">
+                    <LogOut size={18} /> Logout
                 </button>
-            </div>
+            </aside>
+            {open && <button aria-label="Close navigation" onClick={() => setOpen(false)} className="fixed inset-0 z-30 bg-slate-950/30 lg:hidden" />}
 
-            {/* Main Content */}
-            <div className="flex-1 flex flex-col overflow-hidden">
-                <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8">
-                    <h1 className="text-xl font-semibold text-gray-800">JobHunter AI</h1>
-                    <div className="flex items-center gap-4">
-                        <button className="p-2 text-gray-400 hover:text-blue-600 rounded-full hover:bg-blue-50">
-                            <Bell size={20} />
-                        </button>
-                    </div>
+            <div className="min-h-screen lg:pl-72">
+                <header className="sticky top-0 z-20 flex h-16 items-center border-b border-slate-200 bg-white/85 px-5 backdrop-blur lg:px-10">
+                    <button onClick={() => setOpen(true)} className="mr-3 rounded-lg p-2 text-slate-600 lg:hidden"><Menu size={21}/></button>
+                    <p className="text-sm font-medium text-slate-500">Your career workspace</p>
                 </header>
-                <main className="flex-1 overflow-y-auto p-8 bg-gray-50">
+                <main className="p-5 sm:p-8 lg:p-10">
                     <Outlet />
                 </main>
             </div>

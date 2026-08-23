@@ -37,3 +37,25 @@ class Job(Base):
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    # Common provider fields live in the pre-existing JSON column so this
+    # production deployment does not require an unsafe implicit DB migration.
+    @property
+    def external_id(self):
+        return (self.raw_data or {}).get("external_id")
+
+    @property
+    def apply_url(self):
+        return (self.raw_data or {}).get("apply_url") or self.source_url
+
+    @property
+    def remote(self):
+        return (self.raw_data or {}).get("remote")
+
+    @property
+    def skills(self):
+        return (self.raw_data or {}).get("skills") or []
+
+    @property
+    def experience_required(self):
+        return (self.raw_data or {}).get("experience_required")
