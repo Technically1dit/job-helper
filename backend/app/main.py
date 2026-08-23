@@ -8,6 +8,16 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="JobHunter AI MVP")
 
+@app.get("/api/debug")
+def debug():
+    return {
+        "message": "FastAPI is running",
+        "routes": [
+            getattr(route, "path", str(route))
+            for route in app.routes
+        ]
+    }
+    
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[settings.FRONTEND_URL],
